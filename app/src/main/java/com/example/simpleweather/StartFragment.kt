@@ -8,10 +8,12 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentStartBinding
 import com.example.simpleweather.models.AppViewModel
@@ -19,6 +21,7 @@ import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.LocationListenerWithLocationManager
 import com.example.simpleweather.utils.arePermissionsGranted
 import com.example.simpleweather.utils.requestLocationUpdates
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class StartFragment : Fragment(), LocationListenerWithLocationManager {
@@ -129,6 +132,15 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
                 location.longitude.toString(),
                 location.latitude.toString(),
             )
+        }
+    }
+
+    fun refreshTemperature() {
+        sharedViewModel
+            .fetchTemperature()
+            .invokeOnCompletion {
+            Toast.makeText(requireContext(), "Refreshed!", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 }

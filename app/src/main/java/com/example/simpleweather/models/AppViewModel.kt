@@ -78,12 +78,10 @@ class AppViewModel : ViewModel() {
         }
     }
 
-    fun fetchTemperature() {
-        viewModelScope.launch {
-            _location.value?.apply {
-                val temp = WeatherApi.retrofitService.getCurrentWeather(city, countryCode)
-                _temperature.value = temp.toString()
-            }
+    fun fetchTemperature() = viewModelScope.launch {
+        _location.value?.apply {
+            val temp = WeatherApi.retrofitService.getCurrentWeather(city, countryCode)
+            _temperature.value = temp.toString()
         }
     }
 

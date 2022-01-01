@@ -24,10 +24,9 @@
         android:layout_height="match_parent"
         >
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:padding="@dimen/side_margin"
             >
 
@@ -35,9 +34,23 @@
                 android:id="@+id/temperature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{viewModel.temperature}"
                 android:textSize="96sp"
                 tools:text="17 C"
-                android:text="@{viewModel.temperature}"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <ImageButton
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/reload"
+                android:contentDescription="@string/reload"
+                app:layout_constraintStart_toEndOf="@id/temperature"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="36dp"
+                android:layout_marginStart="36dp"
+                android:onClick="@{() -> startFragment.refreshTemperature()}"
                 />
 
             <TextView
@@ -47,6 +60,8 @@
                 android:text="@{@string/location_name(viewModel.location.city, viewModel.location.countryCode)}"
                 android:textSize="68sp"
                 tools:text="Varna, BG"
+                app:layout_constraintTop_toBottomOf="@id/temperature"
+                app:layout_constraintStart_toStartOf="parent"
                 />
 
             <Button
@@ -55,10 +70,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/margin_between_elements"
+                android:drawableEnd="@drawable/ic_arrow_right"
                 android:minWidth="@dimen/order_cupcake_button_width"
                 android:onClick="@{() -> startFragment.navigateToChangeLocationFragment()}"
                 android:text="@string/button_change_location"
-                android:drawableEnd="@drawable/ic_arrow_right"
+                app:layout_constraintTop_toBottomOf="@id/location_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_margin="50dp"
                 />
 
             <Button
@@ -71,8 +90,11 @@
                 android:onClick="@{() -> startFragment.toggleNotifications()}"
                 android:text='@{"Turn notifications " + (viewModel.notifications ? `OFF` : `ON`)}'
                 tools:text="Turn notifications ON"
+                app:layout_constraintTop_toBottomOf="@id/change_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>
