@@ -72,11 +72,11 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         // Comment this to have persistence
-//        sharedPref.edit().clear().commit()
-        when(val locationName = sharedPref.getString(Constants.SharedPreferences_locationName, null)) {
+        // sharedPref.edit().clear().commit()
+        when(val location = LocationWeatherViewModel.Location
+            .parse(sharedPref.getString(Constants.SharedPreferences_location, null))) {
             null -> requestLocation()
-            LocationWeatherViewModel.initialState.locationName.value -> requestLocation()
-            else -> sharedViewModel.setLocationName(locationName)
+            else -> sharedViewModel.setLocationName(location)
         }
 
         return fragmentBinding.root

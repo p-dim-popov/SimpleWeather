@@ -4,6 +4,7 @@ package com.example.simpleweather.models
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.simpleweather.network.LocationDefinition
+import com.example.simpleweather.network.LocationInfo
 import com.example.simpleweather.network.WeatherApi
 import com.example.simpleweather.network.getCurrentWeather
 import kotlinx.coroutines.launch
@@ -11,12 +12,41 @@ import kotlinx.coroutines.launch
 class LocationWeatherViewModel : ViewModel() {
     companion object { val initialState = LocationWeatherViewModel() }
 
-    private val _locationName = MutableLiveData("Loading...") // Varna,BG
-    val locationName: LiveData<String> = _locationName
-    fun setLocationName(locationName: String) {
-        _locationName.value = locationName
+    class Location(
+        val city: String,
+        val countryCode: String,
+    ) {
+        override fun equals(other: Any?): Boolean = other != null && other is Location && with(other) { this.city == this@Location.city && this.countryCode == this@Location.countryCode }
+        override fun hashCode(): Int {
+            var result = city.hashCode()
+            result = 31 * result + countryCode.hashCode()
+            return result
+        }
 
-        if (locationName != initialState.locationName.value) fetchTemperature()
+        override fun toString(): String {
+            return "${city},${countryCode}"
+        }
+
+        companion object {
+            fun parse(string: String?): Location? {
+                 string?.apply {
+                     val (city, countryCode) = split(",")
+                     return Location(city, countryCode)
+                 }
+                return null
+            }
+
+            fun from(location: LocationDefinition): Location {
+                return Location(location.name, location.country)
+            }
+        }
+    }
+
+    private val _locationName = MutableLiveData<Location>(null) // Varna,BG
+    val locationName: LiveData<Location> = _locationName
+    fun setLocationName(location: Location) {
+        _locationName.value = location
+        fetchTemperature()
     }
 
     private val _temperature = MutableLiveData("N/a")
@@ -30,15 +60,11 @@ class LocationWeatherViewModel : ViewModel() {
 
     fun autoSetupLocationName(lon: String, lat: String) {
         viewModelScope.launch {
-            try {
-                val possibleLocations = WeatherApi.retrofitService.getLocationsFromCoordinates(lon, lat)
-                _possibleLocations.value = possibleLocations
+            val possibleLocations = WeatherApi.retrofitService.getLocationsFromCoordinates(lon, lat)
+            _possibleLocations.value = possibleLocations
 
-                val locationInfo = possibleLocations.first()
-                setLocationName("${locationInfo.name},${locationInfo.country}")
-            } catch (e: Exception) {
-                _locationName.value = "Error! Boo! $e"
-            }
+            val locationInfo = possibleLocations.first()
+            setLocationName(Location(locationInfo.name, locationInfo.country))
         }
     }
 
@@ -56,7 +82,6 @@ class LocationWeatherViewModel : ViewModel() {
     fun fetchTemperature() {
         viewModelScope.launch {
             _locationName.value?.apply {
-                val (city, countryCode) = split(",")
                 val temp = WeatherApi.retrofitService.getCurrentWeather(city, countryCode)
                 _temperature.value = temp.toString()
             }

@@ -5,29 +5,32 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.simpleweather.databinding.SuggestionListViewItemBinding
+import com.example.simpleweather.databinding.SearchListViewItemBinding
 import com.example.simpleweather.network.LocationDefinition
 
-class PossibleLocationsAdapter: ListAdapter<LocationDefinition, PossibleLocationsAdapter.PossibleLocationViewHolder>(DiffCallback) {
+typealias OnClickLocationHandler = (LocationDefinition) -> Unit
+
+class PossibleLocationsAdapter(private val onClickLocation: OnClickLocationHandler): ListAdapter<LocationDefinition, PossibleLocationsAdapter.PossibleLocationViewHolder>(DiffCallback) {
     companion object DiffCallback : DiffUtil.ItemCallback<LocationDefinition>() {
         override fun areItemsTheSame(oldItem: LocationDefinition, newItem: LocationDefinition): Boolean = oldItem.name == newItem.name && oldItem.country == newItem.country
         override fun areContentsTheSame(oldItem: LocationDefinition, newItem: LocationDefinition): Boolean = areItemsTheSame(oldItem, newItem)
     }
 
-    class PossibleLocationViewHolder(private var binding: SuggestionListViewItemBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(location: LocationDefinition) {
+    class PossibleLocationViewHolder(private var binding: SearchListViewItemBinding): RecyclerView.ViewHolder(binding.root) {
+        fun bind(location: LocationDefinition, onClickLocation: OnClickLocationHandler) {
             binding.location = location
+            binding.locationOption.setOnClickListener { onClickLocation(location) }
             binding.executePendingBindings()
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PossibleLocationViewHolder {
-        val layout = SuggestionListViewItemBinding.inflate(LayoutInflater.from(parent.context))
+        val layout = SearchListViewItemBinding.inflate(LayoutInflater.from(parent.context))
         return PossibleLocationViewHolder(layout)
     }
 
     override fun onBindViewHolder(holder: PossibleLocationViewHolder, position: Int) {
         val location = getItem(position)
-        holder.bind(location)
+        holder.bind(location, onClickLocation)
     }
 }

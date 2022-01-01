@@ -32,16 +32,16 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         // Set up the action bar for use with the NavController
         setupActionBarWithNavController(navController)
 
-        val sharedPref = getPreferences(Context.MODE_PRIVATE)
-
         sharedViewModel.locationName.observe(this) { newLocationName ->
-            val savedLocationName = sharedPref.getString(Constants.SharedPreferences_locationName, null)
+            getPreferences(Context.MODE_PRIVATE).apply {
+                val savedLocationName = LocationWeatherViewModel.Location.parse(getString(Constants.SharedPreferences_location, null))
 
-            if (savedLocationName == newLocationName || newLocationName == LocationWeatherViewModel.initialState.locationName.value) return@observe
+                if (newLocationName == savedLocationName) return@observe
 
-            with (sharedPref.edit()) {
-                putString(Constants.SharedPreferences_locationName, newLocationName)
-                apply()
+                with (edit()) {
+                    putString(Constants.SharedPreferences_location, newLocationName.toString())
+                    apply()
+                }
             }
         }
     }
@@ -57,11 +57,25 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (permissions.all { Constants.RequiredPermissions_location.contains(it) }
+        if (permissions.all(Constants.RequiredPermissions_location::contains)
             && grantResults.asList().allPermissionsGranted().not()
         ) {
             goToManualInput()
+        } else {
+            restartFragment(R.id.nav_host_fragment)
         }
+    }
+
+    private fun restartFragment(fragmentId: Int) {
+        val currentFragment = supportFragmentManager.findFragmentById(fragmentId)!!
+
+        supportFragmentManager.beginTransaction()
+            .detach(currentFragment)
+            .commit()
+
+        supportFragmentManager.beginTransaction()
+            .attach(currentFragment)
+            .commit()
     }
 
     private fun goToManualInput() {

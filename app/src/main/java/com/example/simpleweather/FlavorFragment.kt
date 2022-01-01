@@ -42,7 +42,10 @@ class FlavorFragment : Fragment(), LocationListenerWithLocationManager {
             lifecycleOwner = viewLifecycleOwner
             viewModel = sharedViewModel
             flavorFragment = this@FlavorFragment
-            possibleOptionsList.adapter = PossibleLocationsAdapter()
+            possibleOptionsList.adapter = PossibleLocationsAdapter {
+                sharedViewModel.setLocationName(LocationWeatherViewModel.Location.from(it))
+                cancel()
+            }
         }
 
         return fragmentBinding.root

@@ -2,7 +2,6 @@
 package com.example.simpleweather
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,14 +32,12 @@ class PickupFragment : Fragment() {
         binding = fragmentBinding
 
         onSearchQueryChanged = throttleLatest(1_000, viewLifecycleOwner.lifecycleScope) {
-            if (it.isBlank()) {
-                _results.value = listOf()
-                return@throttleLatest
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                val result = WeatherApi.retrofitService.getLocationsFromQuery(it.toString())
-                _results.value = result
+            when {
+                it.isBlank() -> _results.value = listOf()
+                else -> viewLifecycleOwner.lifecycleScope.launch {
+                    val result = WeatherApi.retrofitService.getLocationsFromQuery(it.toString())
+                    _results.value = result
+                }
             }
         }
 
@@ -48,7 +45,10 @@ class PickupFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             viewModel = sharedViewModel
             pickupFragment = this@PickupFragment
-            searchOptionsList.adapter = SearchLocationAdapter()
+            searchOptionsList.adapter = PossibleLocationsAdapter {
+                sharedViewModel.setLocationName(LocationWeatherViewModel.Location.from(it))
+                cancel()
+            }
         }
 
         return fragmentBinding.root
