@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentFlavorBinding
-import com.example.simpleweather.models.LocationWeatherViewModel
+import com.example.simpleweather.models.AppViewModel
 import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.LocationListenerWithLocationManager
 import com.example.simpleweather.utils.arePermissionsGranted
@@ -23,7 +23,7 @@ import com.example.simpleweather.utils.requestLocationUpdates
 class FlavorFragment : Fragment(), LocationListenerWithLocationManager {
     override lateinit var locationManager: LocationManager
     private var binding: FragmentFlavorBinding? = null
-    private val sharedViewModel: LocationWeatherViewModel by activityViewModels()
+    private val sharedViewModel: AppViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +43,7 @@ class FlavorFragment : Fragment(), LocationListenerWithLocationManager {
             viewModel = sharedViewModel
             flavorFragment = this@FlavorFragment
             possibleOptionsList.adapter = PossibleLocationsAdapter {
-                sharedViewModel.setLocationName(LocationWeatherViewModel.Location.from(it))
+                sharedViewModel.setLocationName(AppViewModel.Location.from(it))
                 cancel()
             }
         }

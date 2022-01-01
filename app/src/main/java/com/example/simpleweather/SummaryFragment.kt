@@ -1,16 +1,14 @@
 
 package com.example.simpleweather
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentSummaryBinding
-import com.example.simpleweather.models.LocationWeatherViewModel
+import com.example.simpleweather.models.AppViewModel
 
 /**
  * [SummaryFragment] contains a summary of the order details with a button to share the order
@@ -24,7 +22,7 @@ class SummaryFragment : Fragment() {
     private var binding: FragmentSummaryBinding? = null
 
     // Use the 'by activityViewModels()' Kotlin property delegate from the fragment-ktx artifact
-    private val sharedViewModel: LocationWeatherViewModel by activityViewModels()
+    private val sharedViewModel: AppViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

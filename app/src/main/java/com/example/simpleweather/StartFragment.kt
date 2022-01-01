@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentStartBinding
-import com.example.simpleweather.models.LocationWeatherViewModel
+import com.example.simpleweather.models.AppViewModel
 import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.LocationListenerWithLocationManager
 import com.example.simpleweather.utils.arePermissionsGranted
@@ -25,7 +25,7 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
     override lateinit var locationManager: LocationManager
 
     private var binding: FragmentStartBinding? = null
-    private val sharedViewModel: LocationWeatherViewModel by activityViewModels()
+    private val sharedViewModel: AppViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,7 +73,7 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
 
         // Comment this to have persistence
         // sharedPref.edit().clear().commit()
-        when(val location = LocationWeatherViewModel.Location
+        when(val location = AppViewModel.Location
             .parse(sharedPref.getString(Constants.SharedPreferences_location, null))) {
             null -> requestLocation()
             else -> sharedViewModel.setLocationName(location)
@@ -124,7 +124,7 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
     }
 
     override fun onLocationChanged(location: Location) {
-        if (sharedViewModel.locationName.value == LocationWeatherViewModel.initialState.locationName.value) {
+        if (sharedViewModel.locationName.value == AppViewModel.initialState.locationName.value) {
             sharedViewModel.autoSetupLocationName(
                 location.longitude.toString(),
                 location.latitude.toString(),

@@ -4,13 +4,12 @@ package com.example.simpleweather.models
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.simpleweather.network.LocationDefinition
-import com.example.simpleweather.network.LocationInfo
 import com.example.simpleweather.network.WeatherApi
 import com.example.simpleweather.network.getCurrentWeather
 import kotlinx.coroutines.launch
 
-class LocationWeatherViewModel : ViewModel() {
-    companion object { val initialState = LocationWeatherViewModel() }
+class AppViewModel : ViewModel() {
+    companion object { val initialState = AppViewModel() }
 
     class Location(
         val city: String,
@@ -74,7 +73,7 @@ class LocationWeatherViewModel : ViewModel() {
                 val possibleLocations = WeatherApi.retrofitService.getLocationsFromCoordinates(lon, lat)
                 _possibleLocations.value = possibleLocations
             } catch (e: Exception) {
-                Log.e(LocationWeatherViewModel::class.java.toString(), e.toString())
+                Log.e(AppViewModel::class.java.toString(), e.toString())
             }
         }
     }

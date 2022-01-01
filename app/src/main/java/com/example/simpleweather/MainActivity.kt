@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.simpleweather.models.LocationWeatherViewModel
+import com.example.simpleweather.models.AppViewModel
 import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.allPermissionsGranted
 import java.util.*
@@ -19,7 +19,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private lateinit var navController: NavController
-    private val sharedViewModel: LocationWeatherViewModel by viewModels()
+    private val sharedViewModel: AppViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         sharedViewModel.locationName.observe(this) { newLocationName ->
             getPreferences(Context.MODE_PRIVATE).apply {
-                val savedLocationName = LocationWeatherViewModel.Location.parse(getString(Constants.SharedPreferences_location, null))
+                val savedLocationName = AppViewModel.Location.parse(getString(Constants.SharedPreferences_location, null))
 
                 if (newLocationName == savedLocationName) return@observe
 
