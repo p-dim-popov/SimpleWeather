@@ -67,14 +67,12 @@ class AppViewModel : ViewModel() {
         }
     }
 
-    fun updatePossibleLocations(lon: String, lat: String) {
-        viewModelScope.launch {
-            try {
-                val possibleLocations = WeatherApi.retrofitService.getLocationsFromCoordinates(lon, lat)
-                _possibleLocations.value = possibleLocations
-            } catch (e: Exception) {
-                Log.e(AppViewModel::class.java.toString(), e.toString())
-            }
+    fun updatePossibleLocations(lon: String, lat: String) = viewModelScope.launch {
+        try {
+            val possibleLocations = WeatherApi.retrofitService.getLocationsFromCoordinates(lon, lat)
+            _possibleLocations.value = possibleLocations
+        } catch (e: Exception) {
+            Log.e(AppViewModel::class.java.toString(), e.toString())
         }
     }
 

@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentFlavorBinding
 import com.example.simpleweather.models.AppViewModel
@@ -18,6 +20,7 @@ import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.LocationListenerWithLocationManager
 import com.example.simpleweather.utils.arePermissionsGranted
 import com.example.simpleweather.utils.requestLocationUpdates
+import kotlinx.coroutines.launch
 
 
 class FlavorFragment : Fragment(), LocationListenerWithLocationManager {
@@ -61,7 +64,17 @@ class FlavorFragment : Fragment(), LocationListenerWithLocationManager {
     }
 
     override fun onLocationChanged(location: Location) {
-        sharedViewModel.updatePossibleLocations(location.longitude.toString(), location.latitude.toString())
+        with(location) {
+            sharedViewModel
+                .updatePossibleLocations(longitude.toString(), latitude.toString())
+                .invokeOnCompletion {
+                    Toast.makeText(requireContext(), "Possible locations for: \n lon - $longitude\n lat - $latitude", Toast.LENGTH_LONG)
+                        .show()
+                }
+        }
+
         locationManager.removeUpdates(this)
     }
+
+    fun refreshPossibleLocations() = requestLocationUpdates()
 }
