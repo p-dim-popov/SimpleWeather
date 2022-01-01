@@ -35,7 +35,7 @@
                 style="?textAppearanceHeadline6"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@{@string/current_location(viewModel.locationName)}"
+                android:text="@{@string/current_location(viewModel.location)}"
                 android:textAlignment="viewStart"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

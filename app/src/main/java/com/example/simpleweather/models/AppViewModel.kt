@@ -41,10 +41,10 @@ class AppViewModel : ViewModel() {
         }
     }
 
-    private val _locationName = MutableLiveData<Location>(null) // Varna,BG
-    val locationName: LiveData<Location> = _locationName
-    fun setLocationName(location: Location) {
-        _locationName.value = location
+    private val _location = MutableLiveData<Location>(null)
+    val location: LiveData<Location> = _location
+    fun setLocation(location: Location) {
+        _location.value = location
         fetchTemperature()
     }
 
@@ -63,7 +63,7 @@ class AppViewModel : ViewModel() {
             _possibleLocations.value = possibleLocations
 
             val locationInfo = possibleLocations.first()
-            setLocationName(Location(locationInfo.name, locationInfo.country))
+            setLocation(Location(locationInfo.name, locationInfo.country))
         }
     }
 
@@ -80,7 +80,7 @@ class AppViewModel : ViewModel() {
 
     fun fetchTemperature() {
         viewModelScope.launch {
-            _locationName.value?.apply {
+            _location.value?.apply {
                 val temp = WeatherApi.retrofitService.getCurrentWeather(city, countryCode)
                 _temperature.value = temp.toString()
             }

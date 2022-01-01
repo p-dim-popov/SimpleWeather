@@ -43,7 +43,7 @@ class FlavorFragment : Fragment(), LocationListenerWithLocationManager {
             viewModel = sharedViewModel
             flavorFragment = this@FlavorFragment
             possibleOptionsList.adapter = PossibleLocationsAdapter {
-                sharedViewModel.setLocationName(AppViewModel.Location.from(it))
+                sharedViewModel.setLocation(AppViewModel.Location.from(it))
                 cancel()
             }
         }

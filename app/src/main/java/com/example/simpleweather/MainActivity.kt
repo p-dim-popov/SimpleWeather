@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         // Set up the action bar for use with the NavController
         setupActionBarWithNavController(navController)
 
-        sharedViewModel.locationName.observe(this) { newLocationName ->
+        sharedViewModel.location.observe(this) { newLocationName ->
             getPreferences(Context.MODE_PRIVATE).apply {
                 val savedLocationName = AppViewModel.Location.parse(getString(Constants.SharedPreferences_location, null))
 

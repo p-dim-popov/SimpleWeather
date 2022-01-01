@@ -76,7 +76,7 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
         when(val location = AppViewModel.Location
             .parse(sharedPref.getString(Constants.SharedPreferences_location, null))) {
             null -> requestLocation()
-            else -> sharedViewModel.setLocationName(location)
+            else -> sharedViewModel.setLocation(location)
         }
 
         return fragmentBinding.root
@@ -124,7 +124,7 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
     }
 
     override fun onLocationChanged(location: Location) {
-        if (sharedViewModel.locationName.value == AppViewModel.initialState.locationName.value) {
+        if (sharedViewModel.location.value == AppViewModel.initialState.location.value) {
             sharedViewModel.autoSetupLocationName(
                 location.longitude.toString(),
                 location.latitude.toString(),

@@ -44,7 +44,7 @@
                 android:id="@+id/location_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{@string/location_name(viewModel.locationName.city, viewModel.locationName.countryCode)}"
+                android:text="@{@string/location_name(viewModel.location.city, viewModel.location.countryCode)}"
                 android:textSize="68sp"
                 tools:text="Varna, BG"
                 />

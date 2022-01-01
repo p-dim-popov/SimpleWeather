@@ -46,7 +46,7 @@ class PickupFragment : Fragment() {
             viewModel = sharedViewModel
             pickupFragment = this@PickupFragment
             searchOptionsList.adapter = PossibleLocationsAdapter {
-                sharedViewModel.setLocationName(AppViewModel.Location.from(it))
+                sharedViewModel.setLocation(AppViewModel.Location.from(it))
                 cancel()
             }
         }
