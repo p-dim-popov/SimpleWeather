@@ -8,38 +8,45 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.simpleweather.MainActivity
 import com.example.simpleweather.R
 import com.example.simpleweather.models.AppViewModel
 import com.example.simpleweather.network.WeatherApi
 import com.example.simpleweather.network.getCurrentWeather
 import com.example.simpleweather.utils.Constants
-import java.lang.Exception
 
 class CurrentTemperatureWorker(ctx: Context, params: WorkerParameters): CoroutineWorker(ctx, params) {
+    private val notificationManager = getSystemService(applicationContext, NotificationManager::class.java)!!
+    private val baseNotification
+        get() = NotificationCompat.Builder(applicationContext, Constants.NotificationChannel_weatherUpdate)
+            .setSmallIcon(R.drawable.clouds)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+    init { createNotificationChannel(applicationContext) }
+
     override suspend fun doWork(): Result {
-        val appContext = applicationContext
+        val serializedLocation = applicationContext
+            .getSharedPreferences(MainActivity::class.simpleName, Context.MODE_PRIVATE)
+            .getString(Constants.SharedPreferences_location, null)
 
-        AppViewModel.Location.parse(inputData.getString("location"))?.apply {
-
-            val temp = try {
-                WeatherApi.retrofitService.getCurrentWeather(city, countryCode).let { "$it °C" }
-            } catch (e: Exception) { return Result.failure() }
-
-            val notification = NotificationCompat.Builder(appContext, "")
-                .setSmallIcon(R.drawable.clouds)
-                .setContentTitle("$city - $temp")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setChannelId(Constants.NotificationChannel_weatherUpdate)
-                .build()
-
-            val notificationManager = getSystemService(appContext, NotificationManager::class.java)
-
-            createNotificationChannel(applicationContext)
-            notificationManager?.notify(0, notification)
-            return Result.success()
+        return when(val location = AppViewModel.Location.parse(serializedLocation)) {
+            null -> notificationManager.notify(0, baseNotification
+                .setContentTitle("Location unknown or not set")
+                .build())
+                .let { Result.failure() }
+            else -> with(location) {
+                when(val temp = kotlin.runCatching { WeatherApi.retrofitService.getCurrentWeather(city, countryCode) }.getOrNull()) {
+                    null -> notificationManager.notify(0, baseNotification
+                        .setContentTitle("Could not fetch weather info...")
+                        .build())
+                        .let { Result.failure() }
+                    else -> notificationManager.notify(0, baseNotification
+                        .setContentTitle("$city - ${temp.let { "$it °C" }}")
+                        .build())
+                        .let { Result.success() }
+                }
+            }
         }
-
-        return Result.failure()
     }
 
     companion object {
