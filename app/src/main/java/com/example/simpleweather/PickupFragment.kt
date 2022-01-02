@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentPickupBinding
 import com.example.simpleweather.models.AppViewModel
+import com.example.simpleweather.models.AppViewModelFactory
 import com.example.simpleweather.network.LocationDefinition
 import com.example.simpleweather.network.WeatherApi
 import com.example.simpleweather.utils.throttleLatest
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 
 class PickupFragment : Fragment() {
     private var binding: FragmentPickupBinding? = null
-    private val sharedViewModel: AppViewModel by activityViewModels()
+    private val sharedViewModel: AppViewModel by activityViewModels { AppViewModelFactory(requireActivity().application) }
+
     private val _results = MutableLiveData<List<LocationDefinition>>(listOf())
     val results: LiveData<List<LocationDefinition>> = _results
 

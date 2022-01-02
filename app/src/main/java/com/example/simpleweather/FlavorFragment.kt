@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentFlavorBinding
 import com.example.simpleweather.models.AppViewModel
+import com.example.simpleweather.models.AppViewModelFactory
 import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.LocationListenerWithLocationManager
 import com.example.simpleweather.utils.arePermissionsGranted
@@ -26,7 +27,7 @@ import kotlinx.coroutines.launch
 class FlavorFragment : Fragment(), LocationListenerWithLocationManager {
     override lateinit var locationManager: LocationManager
     private var binding: FragmentFlavorBinding? = null
-    private val sharedViewModel: AppViewModel by activityViewModels()
+    private val sharedViewModel: AppViewModel by activityViewModels { AppViewModelFactory(requireActivity().application) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

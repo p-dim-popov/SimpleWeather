@@ -1,16 +1,19 @@
 
 package com.example.simpleweather.models
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import androidx.work.*
 import com.example.simpleweather.network.LocationDefinition
 import com.example.simpleweather.network.WeatherApi
 import com.example.simpleweather.network.getCurrentWeather
+import com.example.simpleweather.utils.Constants
+import com.example.simpleweather.workers.CurrentTemperatureWorker
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
-class AppViewModel : ViewModel() {
-    companion object { val initialState = AppViewModel() }
-
+class AppViewModel(application: Application) : ViewModel() {
     class Location(
         val city: String,
         val countryCode: String,
@@ -41,6 +44,8 @@ class AppViewModel : ViewModel() {
         }
     }
 
+    private val workManager = WorkManager.getInstance(application)
+
     private val _location = MutableLiveData<Location>(null)
     val location: LiveData<Location> = _location
     fun setLocation(location: Location) {
@@ -51,8 +56,11 @@ class AppViewModel : ViewModel() {
     private val _temperature = MutableLiveData("N/a")
     val temperature: LiveData<String> = Transformations.map(_temperature) { "$it °C" }
 
-    private val _notifications = MutableLiveData<Boolean>(false)
+    private val _notifications = MutableLiveData<Boolean>(null)
     val notifications: LiveData<Boolean> = _notifications
+    fun setNotifications(value: Boolean) {
+        _notifications.value = value
+    }
 
     private val _possibleLocations = MutableLiveData<List<LocationDefinition>>()
     val possibleLocations: LiveData<List<LocationDefinition>> = _possibleLocations
@@ -84,6 +92,30 @@ class AppViewModel : ViewModel() {
     }
 
     fun toggleNotifications() {
-        _notifications.value = _notifications.value?.not()
+        setNotifications((_notifications.value ?: false).not())
+        when (_notifications.value) {
+            true -> workManager
+                .enqueueUniquePeriodicWork(
+                    Constants.WorkName_currentWeather,
+                    ExistingPeriodicWorkPolicy.REPLACE,
+                    PeriodicWorkRequestBuilder<CurrentTemperatureWorker>(1, TimeUnit.HOURS)
+                        .setInputData(with(Data.Builder()) {
+                            putString("location", location.value.toString())
+                            build()
+                        })
+                        .build()
+                )
+            else -> workManager.cancelUniqueWork(Constants.WorkName_currentWeather)
+        }
+    }
+}
+
+class AppViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
+            AppViewModel(application) as T
+        } else {
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

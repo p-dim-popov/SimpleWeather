@@ -8,8 +8,10 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.simpleweather.models.AppViewModel
+import com.example.simpleweather.models.AppViewModelFactory
 import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.allPermissionsGranted
+import com.example.simpleweather.workers.CurrentTemperatureWorker
 import java.util.*
 
 /**
@@ -19,7 +21,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private lateinit var navController: NavController
-    private val sharedViewModel: AppViewModel by viewModels()
+    private val sharedViewModel: AppViewModel by viewModels { AppViewModelFactory(application) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

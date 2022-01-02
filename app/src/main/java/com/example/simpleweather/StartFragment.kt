@@ -13,22 +13,21 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.simpleweather.databinding.FragmentStartBinding
 import com.example.simpleweather.models.AppViewModel
+import com.example.simpleweather.models.AppViewModelFactory
 import com.example.simpleweather.utils.Constants
 import com.example.simpleweather.utils.LocationListenerWithLocationManager
 import com.example.simpleweather.utils.arePermissionsGranted
 import com.example.simpleweather.utils.requestLocationUpdates
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class StartFragment : Fragment(), LocationListenerWithLocationManager {
     override lateinit var locationManager: LocationManager
 
     private var binding: FragmentStartBinding? = null
-    private val sharedViewModel: AppViewModel by activityViewModels()
+    private val sharedViewModel: AppViewModel by activityViewModels { AppViewModelFactory(requireActivity().application) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,14 +71,18 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
             gesture.onTouchEvent(event)
         }
 
-        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        with(requireActivity().getPreferences(Context.MODE_PRIVATE)) {
+            // Comment this to have persistence
+            // sharedPref.edit().clear().commit()
+            when(val location = AppViewModel.Location
+                .parse(getString(Constants.SharedPreferences_location, null))) {
+                null -> requestLocation()
+                else -> sharedViewModel.setLocation(location)
+            }
 
-        // Comment this to have persistence
-        // sharedPref.edit().clear().commit()
-        when(val location = AppViewModel.Location
-            .parse(sharedPref.getString(Constants.SharedPreferences_location, null))) {
-            null -> requestLocation()
-            else -> sharedViewModel.setLocation(location)
+            if (sharedViewModel.notifications.value == null) {
+                sharedViewModel.setNotifications(getBoolean(Constants.SharedPreferences_notifications, false))
+            }
         }
 
         return fragmentBinding.root
@@ -115,7 +118,13 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
             .setTitle("Are you sure that you want to turn notifications $newState?")
             .setMessage("You will $willReceive receiving notifications with current weather every 1 hour")
             .setCancelable(true)
-            .setPositiveButton("Yes") { _, _ -> sharedViewModel.toggleNotifications() }
+            .setPositiveButton("Yes") { _, _ ->
+                sharedViewModel.toggleNotifications()
+                with(requireActivity().getPreferences(Context.MODE_PRIVATE).edit()) {
+                    putBoolean(Constants.SharedPreferences_notifications, sharedViewModel.notifications.value!!)
+                    apply()
+                }
+            }
             .setNegativeButton("No") { dialog, _ -> dialog.cancel() }
             .create()
             .show()
@@ -127,7 +136,7 @@ class StartFragment : Fragment(), LocationListenerWithLocationManager {
     }
 
     override fun onLocationChanged(location: Location) {
-        if (sharedViewModel.location.value == AppViewModel.initialState.location.value) {
+        if (sharedViewModel.location.value == null) {
             sharedViewModel.autoSetupLocationName(
                 location.longitude.toString(),
                 location.latitude.toString(),
