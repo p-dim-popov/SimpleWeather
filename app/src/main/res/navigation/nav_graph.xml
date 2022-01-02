@@ -34,7 +34,7 @@
     <fragment
         android:id="@+id/pickupFragment"
         android:name="com.example.simpleweather.PickupFragment"
-        android:label="@string/choose_pickup_date"
+        android:label="@string/search_location"
         tools:layout="@layout/fragment_pickup">
         <action
             android:id="@+id/action_pickupFragment_to_startFragment"
