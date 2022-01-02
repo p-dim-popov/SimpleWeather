@@ -41,7 +41,7 @@ class CurrentTemperatureWorker(ctx: Context, params: WorkerParameters): Coroutin
                         .build())
                         .let { Result.failure() }
                     else -> notificationManager.notify(0, baseNotification
-                        .setContentTitle("$city - ${temp.let { "$it °C" }}")
+                        .setContentTitle("${temp.let { "$it °C" }} in $city")
                         .build())
                         .let { Result.success() }
                 }
